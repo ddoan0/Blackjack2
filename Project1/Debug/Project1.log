@@ -1,0 +1,10 @@
+﻿  Blackjackgame.cpp
+  Card.cpp
+  Deck.cpp
+  Blackjack.cpp
+d:\users\deric\documents\github\blackjack\project1\blackjack.h(29): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  Player.cpp
+  Generating Code...
+  .NETFramework,Version=v4.6.1.AssemblyAttributes.cpp
+  Blackjackgame.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
+  Project1.vcxproj -> D:\Users\Deric\Documents\GitHub\blackjack\Debug\Project1.exe
