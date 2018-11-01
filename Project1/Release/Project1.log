@@ -1,8 +1,3 @@
-﻿  Blackjackgame.cpp
-  Card.cpp
-  Deck.cpp
-  Blackjack.cpp
+﻿  Blackjack.cpp
 d:\users\deric\documents\github\blackjack2\project1\blackjack.h(29): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  Player.cpp
-  Generating Code...
   Project1.vcxproj -> D:\Users\Deric\Documents\GitHub\Blackjack2\Release\Project1.exe

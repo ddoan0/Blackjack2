@@ -8,6 +8,8 @@ public:
 	void shuffle();
 	void populate();
 	bool cardHasBeenDrawn(int);
+	void resetDeck();
+	bool deckHasBeenReset();
 
 public:
 	int deckSize;

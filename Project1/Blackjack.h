@@ -44,18 +44,6 @@ namespace Project1 {
 	private: System::Windows::Forms::Button^  button1;
 	private: System::Windows::Forms::Label^  label1;
 	private: Blackjackgame^ bjg = gcnew Blackjackgame();
-	private: int playerTotal = 0;
-			 int dealerTotal = 0;
-			 int pindex;
-			 int pindex2;
-			 int pindex3;
-			 int pindex4;
-			 int dindex;
-			 int dindex2;
-			 int dindex3;
-			 int dindex4;
-			 int numOfAces = 0;
-			 int dnumOfAces = 0;
 	private: System::Windows::Forms::TextBox^  textBox1;
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Label^  label3;
@@ -454,7 +442,7 @@ namespace Project1 {
 		int temp = int::Parse(textBox1->Text); // store the number from user input text field
 		bjg->set_bet_amount(temp); // use that number to subtract from the player's amount and add to the pot
 		label2->Text = bjg->totalBetAmount.ToString(); // display the total
-		label4->Text = bjg->p->money.ToString();
+		label4->Text = bjg->player->getPlayerMoney().ToString();
 
 		
 	} // bet button
@@ -477,80 +465,33 @@ private: System::Void helpToolStripMenuItem_Click(System::Object^ sender, System
 // START GAME BUTTON
 private: System::Void button4_Click(System::Object^  sender, System::EventArgs^  e) 
 {
-	// Make sure that the hasBeenUsed values in deck are all set to false before using them in start game
-	for (int i = 0; i < 52; i++) {
-		bjg->d->deck[i]->hasBeenUsed = false;
-	}
-	// RESET PLAYER MONEY
-	// RESET POT MONEY
-	// RESET playerTotal card value
-	bjg->p->money = 250; playerTotal = 0; dealerTotal = 0;
-	bjg->totalBetAmount = 0; label2->Text = "0";
-	numOfAces = 0; dnumOfAces = 0;
+	// totalInBets label set to 0. show blank images and back of a card
+	bjg->start_game();
+	label2->Text = "0";
 	pictureBox4->ImageLocation = "images\\smallback.png";
 	pictureBox5->ImageLocation = "images\\blank.png";
 	pictureBox6->ImageLocation = "images\\blank.png";
 	pictureBox7->ImageLocation = "images\\blank.png";
 	pictureBox8->ImageLocation = "images\\blank.png";
 
-	// give the player 2 random cards. We make sure to set the card's hasBeenUsed value to true after picking them so that there are no duplicates
-	pindex = rand() % 52;
-	while (bjg->d->deck[pindex]->hasBeenUsed)
-	{
-		pindex = rand() % 52;
-	}
-	bjg->d->deck[pindex]->hasBeenUsed = true;
-	// check to see if it is an ACE
-	if (pindex == 0 || pindex == 13 || pindex == 26 || pindex == 39)
-	{
-		if (playerTotal + 11 > 21) { playerTotal += 1; }
-		else { playerTotal += 11; }
-		numOfAces++;
-	}
-	else { playerTotal += bjg->d->deck[pindex]->cardValue; }
 	// update pictures for player (picturebox 1 and 3)
-	pictureBox1->ImageLocation = bjg->d->deck[pindex]->img_loc;
-	
-	int pindex2 = rand() % 52;
-	while (bjg->d->deck[pindex2]->hasBeenUsed)
-	{
-		pindex2 = rand() % 52;
-	}
-	bjg->d->deck[pindex2]->hasBeenUsed = true;
-	// check to see if it is an ACE 
-	if (pindex2 == 0 || pindex2 == 13 || pindex2 == 26 || pindex2 == 39)
-	{
-		if (playerTotal + 11 > 21) { playerTotal += 1; }
-		else { playerTotal += 11; }
-		numOfAces++;
-	}
-	else { playerTotal += bjg->d->deck[pindex2]->cardValue; }
-	pictureBox3->ImageLocation = bjg->d->deck[pindex2]->img_loc;
+	Player^ x = bjg->player;
+	pictureBox1->ImageLocation = bjg->hit(&x);
+	pictureBox3->ImageLocation = bjg->hit(&x);
 
 	// show player total
-	label8->Text = playerTotal.ToString();
-
-	// Draw a card for the dealer
-	int dindex = rand() % 52;
-	while (bjg->d->deck[dindex]->hasBeenUsed)
-	{
-		dindex = rand() % 52;
-	}
-	bjg->d->deck[dindex]->hasBeenUsed = true;
-	if (dindex == 0 || dindex == 13 || dindex == 26 || dindex == 39)
-	{
-		if (dealerTotal + 11 > 21) { dealerTotal += 1; }
-		else { dealerTotal += 11; }
-		dnumOfAces++;
-	}
-	label12->Text = dealerTotal.ToString();
-	// picture box 2 and 4 for dealer
-	pictureBox2->ImageLocation = bjg->d->deck[dindex]->img_loc;
+	label8->Text = bjg->player->getTotalCardValue().ToString();
+	
+	// get card for the dealer
+	x = bjg->dealer;
+	// picture box 2 update to show dealer's card
+	pictureBox2->ImageLocation = bjg->hit(&x);
+	label12->Text = bjg->dealer->getTotalCardValue().ToString();
 
 	// TODO: When getting blackjack on first draw, payout to the player
 
 	// check for gamestate
-	if (playerTotal == 21) 
+	if (bjg->player->getTotalCardValue() == 21)
 	{
 		label10->Text = "BLACKJACK"; 
 	}
@@ -566,62 +507,36 @@ private: System::Void button2_Click(System::Object^  sender, System::EventArgs^ 
 {
 	// Give player one card into first slot
 	// i will be 0 if the player just started a game
-	if (i == 0 && playerTotal < 21) 
-	{
-		int pindex3 = rand() % 52;
-		while (bjg->d->deck[pindex3]->hasBeenUsed)
-		{
-			pindex3 = rand() % 52;
-		}
-		bjg->d->deck[pindex3]->hasBeenUsed = true;
-		// if it is an ace it needs to have its value checked
-		if (pindex3 == 0 || pindex3 == 13 || pindex3 == 26 || pindex3 == 39)
-		{
-			if (playerTotal + 11 > 21) { playerTotal += 1; }
-			else { playerTotal += 11; }
-			numOfAces++;
-		}
-		else { playerTotal += bjg->d->deck[pindex3]->cardValue; }
-		
-		// update pictures for player pictureBox 
-		pictureBox5->ImageLocation = bjg->d->deck[pindex3]->img_loc;
+	Player^ x = bjg->player;
+	if (i == 0 && x->getTotalCardValue() < 21) 
+	{	
+		// update pictures for player pictureBox
+		pictureBox5->ImageLocation = bjg->hit(&x);
 		// show player total
-		label8->Text = playerTotal.ToString();
+		label8->Text = x->getTotalCardValue().ToString();
 		i++; // this will move to the next picturebox next time the player hits
 	}
-	else if(i == 1 && playerTotal < 21)
+	else if(i == 1 && x->getTotalCardValue() < 21)
 	{
-		int pindex4 = rand() % 52;
-		while (bjg->d->deck[pindex4]->hasBeenUsed)
-		{
-			pindex4 = rand() % 52;
-		}
-		bjg->d->deck[pindex4]->hasBeenUsed = true;
-		if (pindex4 == 0 || pindex4 == 13 || pindex4 == 26 || pindex4 == 39)
-		{
-			if (playerTotal + 11 > 21) { playerTotal += 1; }
-			else { playerTotal += 11; }
-			numOfAces++;
-		}
-		else { playerTotal += bjg->d->deck[pindex4]->cardValue; }
-
 		// update pictures for player pictureBox 
-		pictureBox6->ImageLocation = bjg->d->deck[pindex4]->img_loc;
+		pictureBox6->ImageLocation = bjg->hit(&x);
 		// show player total
-		label8->Text = playerTotal.ToString();
+		label8->Text = x->getTotalCardValue().ToString();
 		i = 0; // go back to the first piturebox for next round
 	}
 	// check if there were any aces and if the player has busted. if the player busts, use the value of 1 for Aces
-	while (numOfAces > 0 && playerTotal > 21)
+	// TODO: Write a function to do this while loop below
+	while (x->getNumOfAces() > 0 && x->getTotalCardValue() > 21)
 	{
-		numOfAces--;
-		playerTotal -= 10;
+		x->incNumOfAces(-1);
+		x->setTotalCardValue(x->getTotalCardValue() - 10);
 	}
 }// HIT BUTTON
 
  // STAY BUTTON
 private: System::Void button3_Click(System::Object^  sender, System::EventArgs^  e) 
 {
+	/*
 	// Draw a card for the dealer
 	dindex2 = rand() % 52;
 	while (bjg->d->deck[dindex2]->hasBeenUsed)
@@ -722,6 +637,7 @@ private: System::Void button3_Click(System::Object^  sender, System::EventArgs^ 
 	}
 	
 	// TODO: Give money to player if they won, or leave it in pot if they lost
+	*/
 }// STAY BUTTON
 
 };
