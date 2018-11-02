@@ -4,18 +4,17 @@ Deck::Deck()
 {
 	// when a deck is instantiated, all 52 cards also instantiated
 	deck = gcnew array<Card^>(52);
-	for (int i = 0; i < 52; i++)
+	for (int i = 0; i < deckSize; i++)
 	{
 		deck[i] = gcnew Card();
 	}
-	deckSize = deck->Length;
 	// set suits array - 0 = spade, 1 = club, 2 = diamond, 3 = heart
 	suitsTotal = gcnew array<String^>{"s", "c", "d", "h"};
 }
 
 void Deck::resetDeck()
 {
-	for (int i = 0; i < 52; i++) {
+	for (int i = 0; i < deckSize; i++) {
 		deck[i]->hasBeenUsed = false;
 	}
 }
@@ -23,7 +22,7 @@ void Deck::resetDeck()
 bool Deck::deckHasBeenReset()
 {
 	// cycle through the entire deck of cards to see if a card has been used yet.
-	for (int i = 0; i < 52; i++) {
+	for (int i = 0; i < deckSize; i++) {
 		if (deck[i]->hasBeenUsed) return false;
 	}
 	return true;

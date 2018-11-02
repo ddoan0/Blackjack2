@@ -22,5 +22,7 @@ public:
 	void startAnotherRound();
 	String^ hit(Player^ *);
 	void stay();
+	void checkAces(Player^ *);
+	String^ winnerIsDetermined(Player^ *, Player^ *);
 };
 

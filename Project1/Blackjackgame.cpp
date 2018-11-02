@@ -21,6 +21,7 @@ void Blackjackgame::set_bet_amount(int betAmount)
 	{
 		player->setPlayerMoney(player->getPlayerMoney() - betAmount);
 		totalBetAmount += betAmount;
+		dealer->setPlayerMoney(dealer->getPlayerMoney() + totalBetAmount);
 	}
 }
 
@@ -33,16 +34,17 @@ void Blackjackgame::start_game()
 	// Set values of cards and ensure that none of the cards from the deck have been used
 	d->populate();
 	d->resetDeck();
-	player->resetPlayer(1000);
-	dealer->resetPlayer(0);
+	player->resetPlayer(player->getPlayerMoney());
+	dealer->resetPlayer(dealer->getPlayerMoney());
 	totalBetAmount = 0;
 }
 
-// this method will reset the the aces and the amount of cards used in the last round
-// it will NOT reset any of the money amounts as the game is not over
+// not needed. functionality moved to start game.
 void Blackjackgame::startAnotherRound()
 {
-
+	d->resetDeck();
+	player->resetPlayer(player->getPlayerMoney());
+	dealer->resetPlayer(dealer->getPlayerMoney());
 }
 
 // player/dealer gets one card. need to add check to make sure player has not bust yet or has not already held.
@@ -67,8 +69,40 @@ String^ Blackjackgame::hit(Player^ *player)
 	return d->deck[pindex]->img_loc;
 }
 
+// called after 2nd draw to determine whether any aces need to use the 1 value
+void Blackjackgame::checkAces(Player^ *player)
+{
+	while ((*player)->getNumOfAces() > 0 && (*player)->getTotalCardValue() > 21)
+	{
+		(*player)->incNumOfAces(-1);
+		(*player)->setTotalCardValue((*player)->getTotalCardValue() - 10);
+	}
+}
+
 // player stays and then the dealer plays
 void Blackjackgame::stay()
 {
 
+}
+
+String^ Blackjackgame::winnerIsDetermined(Player^ *player, Player^ *dealer)
+{
+	int playerTotal = (*player)->getTotalCardValue();
+	int dealerTotal = (*dealer)->getTotalCardValue();
+	// Compare dealer total to player total
+	if ((playerTotal > dealerTotal || dealerTotal > 21) && playerTotal <= 21)
+	{
+		int i = (*player)->getPlayerMoney() + 2*(*dealer)->getPlayerMoney();
+		(*player)->setPlayerMoney(i);
+		(*dealer)->setPlayerMoney(0);
+		return "Player Win!";
+	}
+	else if (playerTotal == dealerTotal || (playerTotal > 21 && dealerTotal > 21))
+	{
+		return "Tie!";
+	}
+	else
+	{
+		return "Dealer Win!";
+	}
 }
